@@ -1,3 +1,7 @@
+/*
+main_01.c: Just 2 LED light bulbs blink in turns
+*/
+
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************

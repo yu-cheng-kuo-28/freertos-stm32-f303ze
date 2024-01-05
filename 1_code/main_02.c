@@ -1,3 +1,7 @@
+/*
+main_02.c: Emulate a simple producer-consumer case with 1 buffer using 2 LED light bulbs
+*/
+
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -400,7 +404,7 @@ void StartBlink01(void *argument)
 	for(;;) {
 	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0); // Green LED
 	  xSemaphoreGive(xSemaphoreProduce);
-	  osDelay(1000); // Producing time
+	  osDelay(3000); // Producing time
 	}
   /* USER CODE END 5 */
   osThreadTerminate(NULL);
@@ -423,10 +427,10 @@ void StartBlink02(void *argument)
 	    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14); // Red LED
 	    // Protecting console output
 	    if(xSemaphoreTake(xSemaphoreConsole, portMAX_DELAY) == pdTRUE) {
-	      printf("Blink Consumed\n");
+	      // printf("Blink Consumed\n");
 	      xSemaphoreGive(xSemaphoreConsole);
 	    }
-	    osDelay(1500); // Consuming time
+	    osDelay(1000); // Consuming time
 	  }
 	}
   /* USER CODE END StartBlink02 */
