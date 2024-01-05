@@ -1,5 +1,5 @@
 /*
-main_01.c: Just 2 LED light bulbs blink in turns
+main_01.c: Multithreading with 2 LED light bulbs
 */
 
 /* USER CODE BEGIN Header */

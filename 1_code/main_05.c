@@ -1,3 +1,7 @@
+/*
+*main_05.c*: Used 3 LED light bulbs, 2 for the readers and 1 for the writer. Solved the preceding deadlock by a semaphore.
+*/
+
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************

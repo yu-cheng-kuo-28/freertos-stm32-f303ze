@@ -1,3 +1,7 @@
+/*
+*main_04_failed.c*: Used 3 LED light bulbs, 2 for the readers and 1 for the writer. Failed for a deadlock between the readers.
+*/
+
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************

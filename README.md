@@ -6,7 +6,7 @@ Hands-on FreeRTOS on STM32 teaching board NUCLEO-F303ZE
 ### Outline
 
 **(0) Warm-Up**
-- 0-1 *main_01.c*: Just 2 LED light bulbs blink in turns
+- 0-1 *main_01.c*: Multithreading with 2 LED light bulbs
 
 **(1) Producer-Consumer Problem**
 - 1-1 *main_02.c*: With a 1-byte buffer using 2 LED light bulbs 
