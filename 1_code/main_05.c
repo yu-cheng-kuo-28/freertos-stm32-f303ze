@@ -1,7 +1,3 @@
-/*
-main_02.c: Emulate a simple producer-consumer case with 1 buffer using 2 LED light bulbs
-*/
-
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -23,7 +19,6 @@ main_02.c: Emulate a simple producer-consumer case with 1 buffer using 2 LED lig
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,9 +62,36 @@ const osThreadAttr_t blink02_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityBelowNormal,
 };
+/* Definitions for blink03 */
+osThreadId_t blink03Handle;
+const osThreadAttr_t blink03_attributes = {
+  .name = "blink03",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
 /* USER CODE BEGIN PV */
-SemaphoreHandle_t xSemaphoreProduce;
-SemaphoreHandle_t xSemaphoreConsole;
+SemaphoreHandle_t xMutexResourceAccess;  // Mutex for resource access
+SemaphoreHandle_t xMutexReadersCount;    // Mutex for readers count
+
+SemaphoreHandle_t xSemaphoreReaders; // Semaphore for readers
+
+volatile int readersCount = 0;           // Count of active readers
+volatile int writersCount = 0; // Count of active writers
+
+//SemaphoreHandle_t xSemaphoreProduce;
+//SemaphoreHandle_t xSemaphoreConsole;
+//
+#define BUFFER_SIZE 5
+////uint8_t buffer[BUFFER_SIZE];
+////int bufferIndexProducer = 0;
+////int bufferIndexConsumer = 0;
+volatile uint8_t buffer[BUFFER_SIZE];
+volatile int bufferIndexProducer;
+volatile int bufferIndexConsumer;
+//
+//SemaphoreHandle_t xSemaphoreEmptySlots;
+//SemaphoreHandle_t xSemaphoreFilledSlots;
+//SemaphoreHandle_t xSemaphoreConsole;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,6 +102,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_PCD_Init(void);
 void StartBlink01(void *argument);
 void StartBlink02(void *argument);
+void StartBlink03(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -121,9 +144,19 @@ int main(void)
   MX_RTC_Init();
   MX_USART3_UART_Init();
   MX_USB_PCD_Init();
+
   /* USER CODE BEGIN 2 */
-  xSemaphoreProduce = xSemaphoreCreateBinary();
-  xSemaphoreConsole = xSemaphoreCreateMutex();
+  xMutexResourceAccess = xSemaphoreCreateMutex();
+  xMutexReadersCount = xSemaphoreCreateMutex();
+
+  xSemaphoreReaders = xSemaphoreCreateCounting(10, 10); // Allowing up to 10 readers simultaneously
+
+//  xSemaphoreProduce = xSemaphoreCreateBinary();
+//  xSemaphoreConsole = xSemaphoreCreateMutex();
+//
+//  xSemaphoreEmptySlots = xSemaphoreCreateCounting(BUFFER_SIZE, BUFFER_SIZE);
+//  xSemaphoreFilledSlots = xSemaphoreCreateCounting(BUFFER_SIZE, 0);
+//  xSemaphoreConsole = xSemaphoreCreateMutex();
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -151,6 +184,9 @@ int main(void)
 
   /* creation of blink02 */
   blink02Handle = osThreadNew(StartBlink02, NULL, &blink02_attributes);
+
+  /* creation of blink03 */
+  blink03Handle = osThreadNew(StartBlink03, NULL, &blink03_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -399,14 +435,21 @@ int _write(int file, char *ptr, int len) {
 void StartBlink01(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-	for(;;) {
-	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0); // Green LED
-	  xSemaphoreGive(xSemaphoreProduce);
-	  osDelay(3000); // Producing time
-	}
+	  for(;;) {
+	    if(xSemaphoreTake(xMutexResourceAccess, portMAX_DELAY) == pdTRUE) {
+	      writersCount++; // Increment the writers count
+
+	      // Write to the buffer
+	      buffer[bufferIndexProducer] = 100; // Example write operation
+	      bufferIndexProducer = (bufferIndexProducer + 1) % BUFFER_SIZE;
+	      osDelay(800);
+
+	      writersCount--; // Decrement the writers count
+	      xSemaphoreGive(xMutexResourceAccess);
+	    }
+	    osDelay(300); // Adjust delay as needed
+	  }
   /* USER CODE END 5 */
-  osThreadTerminate(NULL);
 }
 
 /* USER CODE BEGIN Header_StartBlink02 */
@@ -419,21 +462,43 @@ void StartBlink01(void *argument)
 void StartBlink02(void *argument)
 {
   /* USER CODE BEGIN StartBlink02 */
-  /* Infinite loop */
-	for(;;) {
-	  if(xSemaphoreTake(xSemaphoreProduce, portMAX_DELAY) == pdTRUE) {
-	    // Consuming the blink
-	    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14); // Red LED
-	    // Protecting console output
-	    if(xSemaphoreTake(xSemaphoreConsole, portMAX_DELAY) == pdTRUE) {
-	      // printf("Blink Consumed\n");
-	      xSemaphoreGive(xSemaphoreConsole);
-	    }
-	    osDelay(1000); // Consuming time
+	  for(;;) {
+	    xSemaphoreTake(xSemaphoreReaders, portMAX_DELAY); // Wait for reader access
+	    readersCount++;
+	    // Read from the buffer
+	    uint8_t item = buffer[bufferIndexConsumer]; // Example read operation
+	    osDelay(800);
+	    xSemaphoreGive(xSemaphoreReaders); // Release reader access
+	    readersCount--;
+	    osDelay(300); // Adjust delay as needed
 	  }
-	}
   /* USER CODE END StartBlink02 */
-  osThreadTerminate(NULL);
+}
+
+/* USER CODE BEGIN Header_StartBlink03 */
+/**
+* @brief Function implementing the blink03 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartBlink03 */
+void StartBlink03(void *argument)
+{
+  /* USER CODE BEGIN StartBlink03 */
+  /* Infinite loop */
+	  volatile int bufferIndexConsumerBlink03 = 0; // Separate index for Blink03
+
+	  for(;;) {
+	    xSemaphoreTake(xSemaphoreReaders, portMAX_DELAY); // Wait for reader access
+	    readersCount++;
+	    // Read from the buffer
+	    uint8_t item = buffer[bufferIndexConsumerBlink03]; // Example read operation
+	    osDelay(800);
+	    xSemaphoreGive(xSemaphoreReaders); // Release reader access
+	    readersCount--;
+	    osDelay(300); // Adjust delay as needed, outside critical section
+	  }
+  /* USER CODE END StartBlink03 */
 }
 
 /**
