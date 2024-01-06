@@ -7,7 +7,7 @@ Hands-on FreeRTOS on STM32 teaching board NUCLEO-F303ZE
 
 | #  | Title | Link |
 |----|-------------|---------|
-| 1  | Hands-On FreeRTOS on STM32 MCU 01 — Producer-Consumer Problem  | [Read More](https://yc-kuo.medium.com/hands-on-freertos-on-stm32-mcu-01-producer-consumer-problem-e3cc921e0660) |
+| 1  | Hands-On FreeRTOS in STM32 01 — Producer-Consumer Problem  | [Read More](https://yc-kuo.medium.com/hands-on-freertos-on-stm32-mcu-01-producer-consumer-problem-e3cc921e0660) |
 
 <br>
 
