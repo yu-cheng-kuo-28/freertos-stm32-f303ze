@@ -403,7 +403,7 @@ void StartBlink01(void *argument)
 	for(;;) {
 	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0); // Green LED
 	  xSemaphoreGive(xSemaphoreProduce);
-	  osDelay(3000); // Producing time
+	  osDelay(4000); // Producing time
 	}
   /* USER CODE END 5 */
   osThreadTerminate(NULL);

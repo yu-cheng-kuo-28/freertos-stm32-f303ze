@@ -395,7 +395,7 @@ void StartBlink01(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0); // Green LED
     osDelay(500);
   }
   /* USER CODE END 5 */
@@ -415,7 +415,7 @@ void StartBlink02(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14); // Red LED
     osDelay(600);
   }
   /* USER CODE END StartBlink02 */
