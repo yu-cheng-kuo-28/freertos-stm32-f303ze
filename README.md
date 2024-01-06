@@ -1,5 +1,5 @@
 ## freertos-stm32-f303ze
-Hands-on FreeRTOS with STM32 teaching board NUCLEO-F303ZE
+Implemented FreeRTOS to resolve the producer-consumer problem & the readers-writers problem with semaphores and mutexes
 
 ----
 
