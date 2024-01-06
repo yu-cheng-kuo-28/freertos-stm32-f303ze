@@ -1,6 +1,8 @@
 ## freertos-stm32-f303ze
 Hands-on FreeRTOS on STM32 teaching board NUCLEO-F303ZE
 
+----
+
 <br>
 
 | #  | Title | Link |
