@@ -1,5 +1,5 @@
 ## freertos-stm32-f303ze
-Implemented FreeRTOS to resolve the producer-consumer problem & the readers-writers problem with semaphores and mutexes
+Implemented FreeRTOS to resolve the producer-consumer problem & readers-writers problem with semaphores and mutexes
 
 ----
 
