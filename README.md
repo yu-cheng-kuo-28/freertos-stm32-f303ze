@@ -1,5 +1,6 @@
 ## freertos-stm32-f303ze
 - Hands-on FreeRTOS with STM32 NUCLEO-F303ZE 
+- Coped with volatile / xSemaphoreCreateMutex() / xSemaphoreGive() / xSemaphoreTake() /xSemaphoreCreateCounting()
 - Implemented FreeRTOS to resolve the producer-consumer problem & readers-writers problem with semaphores and mutexes
 
 ----
